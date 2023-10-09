@@ -2,6 +2,7 @@ package org.zerock.guestbook.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.zerock.guestbook.dto.GuestbookDTO;
 import org.zerock.guestbook.dto.PageRequestDTO;
+import org.zerock.guestbook.entity.Guestbook;
+import org.zerock.guestbook.repository.GuestbookRepository;
 import org.zerock.guestbook.service.GuestbookService;
+
+import javax.annotation.PostConstruct;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/guestbook")
@@ -20,6 +26,9 @@ import org.zerock.guestbook.service.GuestbookService;
 public class GuestbookController {
 
     private final GuestbookService service; //final로 선언
+
+    @Autowired
+    private GuestbookRepository guestbookRepository;
 
     @GetMapping("/")
     public String index() {
@@ -104,7 +113,19 @@ public class GuestbookController {
 
     }
 
+    @PostConstruct
+    public void insertDummies(){
 
+        IntStream.rangeClosed(1,300).forEach(i -> {
+
+            Guestbook guestbook = Guestbook.builder()
+                    .title("Title...." + i)
+                    .content("Content..." +i)
+                    .writer("user" + (i % 10))
+                    .build();
+            System.out.println(guestbookRepository.save(guestbook));
+        });
+    }
 
 
 }
